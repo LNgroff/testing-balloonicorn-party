@@ -40,9 +40,35 @@ class PartyTests(unittest.TestCase):
     def test_rsvp_mel(self):
         """Can we keep Mel out?"""
 
-        # FIXME: write a test that mel can't invite himself
-        pass
-        print("FIXME")
+        rsvp_info = {'name': "Mel Melitpolski", 'email': "mel@ubermelon.com"}
+        result = self.client.post("/rsvp", data=rsvp_info, 
+                                    follow_redirects=True)
+
+        self.assertNotIn(b"Party Details", result.data)
+        self.assertIn(b"Please RSVP", result.data)
+        self.assertNotIn(b"Yay!", result.data)
+
+    def test_rsvp_capital_mel(self):
+        """Can we keep Mel out if he uses strange capitalization?"""
+
+        rsvp_info = {'name': "Mel MeLIToPolSKI", 'email': "MEL@ubermelon.com"}
+        result = self.client.post("/rsvp", data=rsvp_info, 
+                                    follow_redirects=True)
+
+        self.assertNotIn(b"Party Details", result.data)
+        self.assertIn(b"Please RSVP", result.data)
+        self.assertNotIn(b"Yay!", result.data)
+
+    def test_rsvp_shortname_mel(self):
+        """Can we keep Mel out if he uses just his first name?"""
+
+        rsvp_info = {'name': "Mel", 'email': "test@ubermelon.com"}
+        result = self.client.post("/rsvp", data=rsvp_info, 
+                                    follow_redirects=True)
+
+        self.assertNotIn(b"Party Details", result.data)
+        self.assertIn(b"Please RSVP", result.data)
+        self.assertNotIn(b"Yay!", result.data)
 
 
 if __name__ == "__main__":
